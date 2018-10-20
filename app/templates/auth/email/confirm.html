@@ -1,0 +1,3 @@
+<p>dear,{{ user.email }},通过以下链接激活:</p>
+
+<p>{{ url_for('auth.confirm',token = token,_external = True) }}</p>

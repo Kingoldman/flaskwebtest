@@ -1,0 +1,26 @@
+
+<!--集成富文本编辑-->
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}文章编辑{% endblock %}
+
+{% block head %}
+{{ super() }}
+<script src="//cdn.ckeditor.com/4.4.6/standard/ckeditor.js"></script>
+{% endblock %}
+
+
+{% block page_content %}
+<div class = "page-header">
+	<h1>文章编辑</h1>
+</div>
+<div>
+	<form method="post" action = "">
+		{{ form.csrf_token }}
+		{{ form.body(class = "ckeditor") }}
+		<br>
+		<button type="submit" class="btn btn-success">提交</button>
+	</form>
+</div>
+{% endblock %}

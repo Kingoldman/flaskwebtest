@@ -1,0 +1,72 @@
+
+{% extends "bootstrap/base.html" %}
+ 
+{% block title %}{% endblock %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+{% endblock %}
+
+
+{% block navbar %}
+<div class="navbar navbar-inverse" role ="navigation">
+    <div class="container"> 
+    <div class="navbar-header">
+        <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="{{ url_for('main.index') }}">WHY</a>
+    </div>
+    <div class="navbar-collapse collapse">
+        <ul class="nav navbar-nav">
+            <li><a href="{{ url_for('main.index') }}"><span class = "glyphicon glyphicon-home"></span> 首页</a></li>
+            <li><a href="{{ url_for('main.about') }}"><span class = "glyphicon glyphicon-info-sign"></span> 关于</a></li>
+        </ul>
+        <ul class="nav navbar-nav navbar-right"> 
+        	{% if current_user.is_authenticated %}
+           <li class="dropdown">
+                     <a href="#" class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span> {{current_user.username}}<b class="caret"></b></a>
+                     <ul class="dropdown-menu">
+                     	 <li><a href="{{ url_for('main.user',username = current_user.username)}}"><span class="glyphicon glyphicon-user"></span> 个人资料</a></li>
+                         <li><a href="{{ url_for('auth.changepassword') }}"><span class="glyphicon glyphicon-wrench"></span> 修改密码</a></li>
+                         <li><a href="{{ url_for('auth.logout') }}"><span class="glyphicon glyphicon-log-out"></span> 登出</a></li> 
+                     </ul>
+            </li>
+
+
+           {% else %}
+            <li><a href="{{ url_for('auth.login') }}"><span class="glyphicon glyphicon-log-in"></span> 登录</a></li>
+            {% endif %} 
+        </ul>
+    </div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block content %}
+	<div class="container">
+		{% for message in get_flashed_messages() %}
+			<div class="alert alert-info alert-dismissable">
+				<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+				{{ message }}
+			</div>
+		{% endfor %}
+	
+		{% block page_content %}{% endblock %}
+	</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{{ moment.include_moment() }}
+{{ moment.locale('zh-cn') }}
+{% endblock %}
+
+
+
+

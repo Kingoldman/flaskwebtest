@@ -1,0 +1,3 @@
+dear,{{ user.email }},click:
+
+{{ url_for('auth.confirm',token = token,_external = True) }}

@@ -1,0 +1,60 @@
+<style type="text/css">
+    .col-xs-4 {
+    text-align: left;
+    font-weight: bold;
+    margin-right:200px;
+    margin-left:-15px;
+    }
+    .col-xs-5{
+       text-align: right; 
+        margin-right:0px;
+        margin-left:0px;
+    }
+    .row{
+        margin-right:0px;
+        margin-left:0px;
+        text-align: right;
+    }
+}
+
+</style>
+
+
+<ul class="posts">
+     {% for post in posts %}
+     <li class="post">
+         <div class="post-thumbnail">
+             <a href="{{ url_for('main.user', username=post.author.username) }}">
+                 <img class="img-rounded profile-thumbnail" src="{{ post.author.gravatar(size=40) }}">
+             </a>
+         </div>
+         <div class="post-content">
+            <div class="post-author">
+                <a href="{{ url_for('main.user', username=post.author.username) }}">{{ post.author.username }}</a>
+            </div>
+            <div class="post-body">
+                <!--摘要|striptags|safe|truncatechars:100|linebreaks-->
+                {% if post.body_html %}
+                <!--markdown转换成的html在服务器上生成，可以放心渲染-->
+                {{ post.body_html |safe|striptags|truncate(length=100,killwords=False) }}
+                {% else %}
+                {{ post.body |safe|striptags|truncate(length=100,killwords=False) }}
+                {% endif %}
+            </div>
+            <br>
+                <div class="row">
+                    <div class="col-xs-4" >
+                        {{ moment(post.timestamp).format('LLL') }}
+                    </div>
+                    <div class = "col-xs-5">
+                        <span class="label label-success">评论(  {{ post.comments.count() }} )</span>
+                        <a href="{{ url_for('main.allonepost',id = post.id) }}">
+                            <span class="label label-default">阅读全文</span>
+                        </a>
+                    </div>
+            </div>
+        </div>
+     </li>
+     <br>
+     {% endfor %}
+ </ul>

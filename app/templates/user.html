@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}用户{% endblock %}
+{% import "_macros.html" as macros %}
+{% block page_content %}
+<div class="page-header">
+	<img class="img-rounded profile-thumbnail" src="{{ user.gravatar(size = 256) }}">
+	<div class ="profile-header">
+		<h1>{{user.username}}</h1>
+		{% if user.name or user.location %}
+		<p>
+			{% if user.name %}
+			姓名：{{ user.name }}
+			{% endif %}
+			<br>
+			{% if user.location %}
+			地址：{{ user.location }}
+			{% endif %}
+		</p>
+		{% endif %}
+
+		{% if current_user.is_administrator %}
+		<p><a href = "mailto:{{ user.email }}">{{ user.email }}</a></p>
+		{% endif %}
+
+		{% if user.about_me %}
+		<p>个人说明：{{ user.about_me }}</p>
+		{% endif %}
+
+		<p>
+			{% if user == current_user %}
+			你的注册时间： {{ moment(user.member_since).format("LLL") }}。
+			<br>
+			上次访问时间： {{ moment(user.last_seen).format("LLL") }}。
+			{% endif %}
+		</p>
+
+	<p>
+		{% if user == current_user %}
+		<a class = "btn btn-success" href = "{{ url_for('main.edit_profile') }}">
+			编辑个人资料
+		</a>
+		{% endif %}
+
+		{% if current_user.is_administrator %}
+		<a class = "btn btn-danger" href = "{{ url_for('main.edit_profile_admin',id = user.id) }}">
+			编辑个人资料[管理员]
+		</a>
+		{% endif %}
+	</p>
+
+	</div>
+</div>
+{% include '_posts.html' %}
+{% if pagination %}
+<div class="pagination">
+	{{ macros.pagination_widget(pagination,'main.user',username = user.username) }}
+</div>
+{% endif %}
+
+{% endblock %}

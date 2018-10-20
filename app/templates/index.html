@@ -1,0 +1,54 @@
+
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
+
+{% block title %}首页{% endblock %}
+
+{% block head %}
+{{ super() }}
+<script src="//cdn.ckeditor.com/4.4.6/standard/ckeditor.js"></script>
+{% endblock %}
+
+{% block page_content %}
+	<div class="page-header">
+		<h4><strong>Hello，
+		{% if current_user.is_authenticated %}
+		{{current_user.username}}。可以在这里发表你的看法。
+		{% else %}
+		瓜皮，你还没有登录。
+		{% endif %}
+		</strong></h4>
+	</div>
+	<div>
+		{% if current_user.is_authenticated %}
+			<!--{{ wtf.quick_form(form) }}-->
+		<div>
+			<form method="post" action = "">
+				{{ form.csrf_token }}
+				{{ form.body(class = "ckeditor") }}
+				<br>
+				<button type="submit" class="btn btn-success">提交</button>
+			</form>
+		</div>
+		{% endif %}
+	</div>
+	<br>
+	<div>
+		{% if posts %}
+			{% include '_posts.html' %}
+			<div class="pagination">
+				{{ macros.pagination_widget(pagination,'main.index') }}
+			</div>
+		{% else %}
+			暂无文章。
+		{% endif %}
+    </div>
+
+{% endblock %}
+
+<!--markdown预览使用pagedown生成，flask_pagedown提供了一个模板宏-->
+{% block scripts %}
+{{ super() }}
+{{ pagedown.include_pagedown() }}
+{% endblock %}
