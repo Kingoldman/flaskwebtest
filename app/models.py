@@ -136,7 +136,7 @@ class Comment(db.Model):
 	body_html = db.Column(db.Text)
 	timestamp = db.Column(db.DateTime,index = True,default = datetime.utcnow)
 	author_id = db.Column(db.Integer,db.ForeignKey('users.id'))
-	#转换后的博客HTML代码,markdown用
+
 	post_id = db.Column(db.Integer,db.ForeignKey('posts.id'))
 
 	@staticmethod
@@ -156,21 +156,8 @@ class Post(db.Model):
 	body = db.Column(db.Text)
 	timestamp = db.Column(db.DateTime,index = True,default = datetime.utcnow)
 	author_id = db.Column(db.Integer,db.ForeignKey('users.id'))
-	#转换后的博客HTML代码,markdown用
-	body_html = db.Column(db.Text)
-	#title = db.Column(db.String(128),index = True)
 	postcategory_id = db.Column(db.Integer,db.ForeignKey('postcategorys.id'))
-
 	comments = db.relationship('Comment',backref = 'post',lazy = 'dynamic')
-	#文章摘要
-	postsummary = db.Column(db.Text)
-
-	def __init__(self,**kwargs):
-		super(Post,self).__init__(**kwargs)
-		if self.body_html:
-			self.postsummary = self.body_html[0:100]
-		elif self.body:
-			self.postsummary = self.body[0:100]
 
 	#生成虚拟博客供测试
 	@staticmethod
@@ -185,17 +172,6 @@ class Post(db.Model):
 			p = Post(body = forgery_py.lorem_ipsum.sentences(randint(1,3)),timestamp = forgery_py.date.date(True),author = u)
 			db.session.add(p)
 			db.session.commit()
-
-
-	#处理markdown文本
-	@staticmethod
-	def on_changed_body(target,value,oldvalue,initiator):
-		allowed_tags = ['a','abbr','acronym','b','blockquote','code','em','i','li','ol','pre','strong','ul','h1','h2','h3','p'
-		]
-		target.body_html = bleach.linkify(bleach.clean(markdown(value,output_format = 'html'),tags = allowed_tags,strip = True))
-
-#监听如果body变动，自动被调用	
-db.event.listen(Post.body,'set',Post.on_changed_body)
 
 
 #回调函数

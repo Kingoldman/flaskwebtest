@@ -18,7 +18,6 @@
 </style>
 
 <ul class="posts">
-     {% for post in posts %}
      <li class="post">
          <div class="post-thumbnail">
              <a href="{{ url_for('main.user', username=post.author.username) }}">
@@ -30,13 +29,8 @@
                 <a href="{{ url_for('main.user', username=post.author.username) }}">{{ post.author.username }}</a>
             </div>
             <div class="post-body">
-                <!--摘要|striptags|safe|truncatechars:100|linebreaks-->
-
-                {% if post.body_html %}
-                <!--markdown转换成的html在服务器上生成，可以放心渲染-->
-                {{ post.body_html | safe }}
-                {% else %}
-                {{ post.body }}
+                {% if post.body %}
+                {{ post.body | safe }}
                 {% endif %}
             </div>
             <br>
@@ -66,10 +60,8 @@
             </div>
         </div>
         </div>
-    <!--/div-->
      </li>
      <br>
-     {% endfor %}
  </ul>
 
 

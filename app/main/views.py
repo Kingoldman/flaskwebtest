@@ -184,7 +184,7 @@ def deletepost(id):
 			flash("文章删除成功")
 			return redirect(url_for('main.index'))
 
-	return render_template('delete_post.html',form = form,posts = [post])
+	return render_template('delete_post.html',form = form,post = post)
 
 
 
@@ -202,7 +202,8 @@ def allonepost(id):
 		else:
 			flash("登录之后才能评论！")
 		return redirect(url_for('main.allonepost',id = post.id))
-		
+	
+	#评论分页
 	page = request.args.get('page',1,type = int)
 	if page == -1:
 		page = (post.comments.count() - 1) / current_app.config['WHY_COMMENTS_PER_PAGE'] + 1
@@ -210,4 +211,4 @@ def allonepost(id):
 	pagination = post.comments.order_by(Comment.timestamp.desc()).paginate(page,per_page = current_app.config['WHY_COMMENTS_PER_PAGE'],error_out = False )
 	comments = pagination.items
 	#接收列表，为了_posts.html使用
-	return render_template('onepost.html',posts = [post],form = form,comments = comments,pagination = pagination)
+	return render_template('onepost.html',post = post,form = form,comments = comments,pagination = pagination)

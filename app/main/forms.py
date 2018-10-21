@@ -3,7 +3,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField,BooleanField,SubmitField,PasswordField,TextAreaField,SelectField,TextAreaField
 from wtforms.validators import DataRequired,Email,EqualTo,ValidationError,Length
 from app.models import User,Comment,Post
-from flask_pagedown.fields import PageDownField
+#from flask_pagedown.fields import PageDownField
 
 
 #用户资料管理
@@ -61,7 +61,7 @@ class PostEditForm(FlaskForm):
 
 
 class CommentForm(FlaskForm):
-	body = PageDownField("内容",validators = [DataRequired()],render_kw={"placeholder": "这里填写评论内容，支持MarkDown语法"})
+	body = TextAreaField("内容",validators = [DataRequired(),Length(1,128)],render_kw={"placeholder": "这里填写评论内容"})
 	submit  = SubmitField("发表")
 
 class DeleteCommentForm(FlaskForm):
