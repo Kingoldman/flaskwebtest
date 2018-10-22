@@ -212,3 +212,76 @@ def allonepost(id):
 	comments = pagination.items
 	#接收列表，为了_posts.html使用
 	return render_template('onepost.html',post = post,form = form,comments = comments,pagination = pagination)
+
+@main.route('/follow/<username>',methods = ['GET','POST'])
+@login_required
+def follow(username):
+	user = User.query.filter_by(username = username ).first()
+	if user is None:
+		flash("错误！")
+		return redirect(url_for('main.index'))
+	if current_user.is_following(user):
+		flash("你已经关注了%s"%username)
+		return redirect(url_for('main.user',username = username))
+	current_user.follow(user)
+	flash("你关注了%s"%username)
+	return redirect(url_for('main.user',username = username))
+
+
+@main.route('/unfollow/<username>',methods = ['GET','POST'])
+@login_required
+def unfollow(username):
+	user = User.query.filter_by(username = username ).first()
+	if user is None:
+		flash("错误！")
+		return redirect(url_for('main.index'))
+	if not current_user.is_following(user):
+		flash("你没有关注%s"%username)
+		return redirect(url_for('main.user',username = username))
+	current_user.unfollow(user)
+	flash("你取消了关注%s"%username)
+	return redirect(url_for('main.user',username = username))
+
+@main.route('/followers/<username>',methods = ['GET','POST'])
+@login_required
+def followers(username):
+	user = User.query.filter_by(username = username ).first()
+	if current_user != user and not current_user.can():
+		abort(403)
+	if user is None:
+		flash("错误！")
+		return redirect(url_for('main.index'))
+	page = request.args.get('page',1,type = int)
+	pagination = user.followers.paginate(page,per_page = current_app.config['WHY_FOLLOWERS_PER_PAGE'],error_out = False)
+	follows = [{'user':item.follower,'timestamp':item.timestamp} for item in pagination.items]
+	return render_template('followers.html',user = user,endpoint = 'main.followers',pagination = pagination,follows = follows)
+
+
+
+@main.route('/followed_by/<username>',methods = ['GET','POST'])
+@login_required
+def followed_by(username):
+	user = User.query.filter_by(username = username ).first()
+	if current_user != user and not current_user.can():
+		abort(403)
+	if user is None:
+		flash("错误！")
+		return redirect(url_for('main.index'))
+	page = request.args.get('page',1,type = int)
+	pagination = user.followed.paginate(page,per_page = current_app.config['WHY_FOLLOWERS_PER_PAGE'],error_out = False)
+	follows = [{'user':item.followed,'timestamp':item.timestamp} for item in pagination.items]
+	return render_template('followed_by.html',user = user,endpoint = 'main.followed_by',pagination = pagination,follows = follows)
+
+
+
+@main.route('/myfollow',methods = ['GET','POST'])
+@login_required
+def myfollow():
+	posts = current_user.followed_posts
+
+	page = request.args.get('page',1,type = int)
+	pagination = posts.paginate(page,per_page = current_app.config['WHY_POSTS_PER_PAGE'],error_out = False)
+	posts = pagination.items
+
+	return render_template('index.html',posts = posts,pagination = pagination)
+

@@ -42,7 +42,7 @@
             </div>
                 <div class="row">
                     <div class="col-xs-4" >
-                        {{ moment(post.timestamp).format('LLL') }}
+                        {{ moment(post.timestamp).fromNow() }}
                     </div>
                     <div class = "col-xs-5">
                         <span class="label label-success">评论(  {{ post.comments.count() }} )</span>

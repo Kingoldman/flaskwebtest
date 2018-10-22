@@ -24,6 +24,9 @@
     <div class="navbar-collapse collapse">
         <ul class="nav navbar-nav">
             <li><a href="{{ url_for('main.index') }}"><span class = "glyphicon glyphicon-home"></span> 首页</a></li>
+            {% if current_user.is_authenticated %}
+            <li><a href="{{ url_for('main.myfollow') }}"><span class = "glyphicon glyphicon-heart"></span> 我的关注</a></li>
+            {% endif %}
             <li><a href="{{ url_for('main.about') }}"><span class = "glyphicon glyphicon-info-sign"></span> 关于</a></li>
         </ul>
         <ul class="nav navbar-nav navbar-right"> 

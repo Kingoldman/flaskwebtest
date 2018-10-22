@@ -47,7 +47,38 @@
 		</a>
 		{% endif %}
 	</p>
+	<p>
+		{% if user != current_user %}
+			{% if not current_user.is_following(user) %}
+				<a class = "btn btn-primary" href = "{{ url_for('main.follow',username = user.username ) }}">
+					关注
+				</a>
+			{% else %}
+				<a class = "btn btn-danger" href = "{{ url_for('main.unfollow',username = user.username ) }}">
+					取消关注
+				</a>
+			{% endif %}
 
+			<a class = "btn btn-primary" href = "{{ url_for('main.followers',username = user.username ) }}">
+				被人关注：<span class="badge">{{user.followers.count()}}</span>
+			</a>
+			<a class = "btn btn-success" href = "{{ url_for('main.followed_by',username = user.username ) }}">
+				关注他人：<span class="badge">{{user.followed.count()}}</span>
+			</a>
+		
+		{% else %}
+			<a class = "btn btn-primary" href = "{{ url_for('main.followers',username = user.username ) }}">
+				被人关注：<span class="badge">{{user.followers.count()}}</span>
+			</a>
+			<a class = "btn btn-success" href = "{{ url_for('main.followed_by',username = user.username ) }}">
+				关注他人：<span class="badge">{{user.followed.count()}}</span>
+			</a>
+		{% endif %}
+
+		{% if current_user.is_authenticated and user != current_user and user.is_following(current_user) %}
+				<span class="label label-default">你已经被该用户关注</span>
+			{% endif %}
+	</p>
 	</div>
 </div>
 {% include '_posts.html' %}

@@ -10,6 +10,15 @@ import hashlib
 import bleach
 from markdown import markdown
 
+
+#第三张表
+class Follow(db.Model):
+	__tablename__ = "follows"
+	follower_id = db.Column(db.Integer,db.ForeignKey('users.id'),primary_key = True)
+
+	followed_id = db.Column(db.Integer,db.ForeignKey('users.id'),primary_key = True)
+	timestamp = db.Column(db.DateTime,default = datetime.utcnow)
+
 class User(UserMixin,db.Model):
 	__tablename__ ='users'
 	id = db.Column(db.Integer,primary_key = True)
@@ -31,15 +40,66 @@ class User(UserMixin,db.Model):
 
 	comments = db.relationship('Comment',backref = 'author',lazy = 'dynamic')
 
+
+	#两个一对多实现多对多
+	followed = db.relationship(
+		'Follow',
+		foreign_keys = [Follow.follower_id],
+		backref = db.backref('follower',lazy = 'joined'),
+		lazy = 'dynamic',
+		cascade = 'all,delete-orphan'
+		)
+
+	followers = db.relationship(
+		'Follow',
+		foreign_keys = [Follow.followed_id],
+		backref = db.backref('followed',lazy = 'joined'),
+		lazy = 'dynamic',
+		cascade = 'all,delete-orphan'
+		)
+
+
 	def __init__(self,**kwargs):
 		super(User,self).__init__(**kwargs)
 		#Roel--backref = 'role'
 		if self.email == current_app.config['WHYBLOG_ADMIN']:
 			self.is_administrator = True
 
-		#模型初始化计算散列值
+		#模型初始化计算散列值，以便后边直接下载
 		if self.email is not None and self.avatar_hash is None:
 			self.avatar_hash = hashlib.md5(self.email.lower().encode('utf-8')).hexdigest()
+
+	#检测当前用户是否关注了user
+	def is_following(self,user):
+		return self.followed.filter_by(followed_id = user.id).first() is not None
+	#关注用户
+	def follow(self,user):
+		if not self.is_following(user):
+			f = Follow(follower = self, followed = user)
+			db.session.add(f)
+			db.session.commit()
+	#取关
+	def unfollow(self,user):
+		f = self.followed.filter_by(followed_id = user.id).first()
+		if f:
+			db.session.delete(f)
+			db.session.commit()
+
+	#是否被关注
+	def is_followed_by(self,user):
+		return self.followers.filter_by(follower_id = user.id).first() is not None
+	
+	#获取已关注用户的帖子,联合表
+	@property
+	def followed_posts(self):
+		#followers与posts以括号条件表联合，文章作者是被关注者
+		ondestep = Post.query.join(Follow,Follow.followed_id == Post.author_id)
+		#过滤当前用户是关注者的行
+		twostep = ondestep.filter(Follow.follower_id == self.id )
+		#在关注者文章列表里看见自己的文章
+		own = Post.query.filter_by(author_id = self.id)
+		threestep = twostep.union(own).order_by(Post.timestamp.desc())
+		return threestep
 
 	def can(self):
 		if self.is_administrator:
@@ -133,19 +193,19 @@ class Comment(db.Model):
 	__tablename__ = "comments"
 	id = db.Column(db.Integer,primary_key = True)
 	body = db.Column(db.Text)
-	body_html = db.Column(db.Text)
+	#body_html = db.Column(db.Text)
 	timestamp = db.Column(db.DateTime,index = True,default = datetime.utcnow)
 	author_id = db.Column(db.Integer,db.ForeignKey('users.id'))
 
 	post_id = db.Column(db.Integer,db.ForeignKey('posts.id'))
-
+'''
 	@staticmethod
 	def on_changed_body(target,value,oldvalue,initiator):
 		allowed_tags = ['a','abbr','acronym','b','code','em','i','strong']
 		target.body_html = bleach.linkify(bleach.clean(markdown(value,output_format = 'html'),tags = allowed_tags,strip = True))
-
+'''
 #监听如果body变动，自动被调用	
-db.event.listen(Comment.body,'set',Comment.on_changed_body)
+#db.event.listen(Comment.body,'set',Comment.on_changed_body)
 
 
 
