@@ -6,6 +6,7 @@ from flask_login import LoginManager
 from flask_mail import Mail
 from flask_moment import Moment
 from flask_pagedown import PageDown
+import flask_whooshalchemyplus
 
 moment = Moment()
 db = SQLAlchemy()
@@ -30,6 +31,7 @@ def create_app(config_name):
 	loginmanager.init_app(app)
 	mail.init_app(app)
 	pagedown.init_app(app)
+	flask_whooshalchemyplus.init_app(app)
 
 	from .main import main
 	app.register_blueprint(main)

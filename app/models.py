@@ -9,6 +9,9 @@ from datetime import datetime
 import hashlib
 import bleach
 from markdown import markdown
+#结巴分词搜索用中文搜索
+from jieba.analyse.analyzer import ChineseAnalyzer
+
 
 
 #第三张表
@@ -212,6 +215,10 @@ class Comment(db.Model):
 
 class Post(db.Model):
 	__tablename__ = 'posts'
+	#搜索内容
+	__searchable__ = ['body']
+	__analyzer__ = ChineseAnalyzer()
+
 	id = db.Column(db.Integer,primary_key = True)
 	body = db.Column(db.Text)
 	timestamp = db.Column(db.DateTime,index = True,default = datetime.utcnow)

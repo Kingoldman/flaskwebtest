@@ -3,18 +3,14 @@ from . import main
 from ..models import User,Post,Comment
 from flask_login import login_required,current_user
 from .forms import EditProfileForm,EditProfileAdminForm,PostForm,PostEditForm,CommentForm,DeleteCommentForm,DeletePostForm,PostEditForm
-from ..__init__ import db
+from ..__init__ import db,flask_whooshalchemyplus
 from ..decorators import admin_required
 import datetime
-
-
-
 
 
 @main.route('/about',methods = ['POST','GET'])
 def about():
 	return render_template('about.html')
-
 
 #资料页面路由
 @main.route('/user/<username>')
@@ -28,7 +24,6 @@ def user(username):
 	posts = pagination.items
 
 	return render_template('user.html',user = user,posts = posts,pagination = pagination)
-
 
 #用户级别编辑
 @main.route('/edit_profile',methods = ['POST','GET'])
@@ -97,10 +92,7 @@ def index():
 	pagination = Post.query.order_by(Post.timestamp.desc()).paginate(page,per_page = current_app.config['WHY_POSTS_PER_PAGE'],error_out = False)
 	posts = pagination.items
 
-	return render_template('index.html',form = form,posts = posts,pagination = pagination)
-
-
-
+	return render_template('index.html',title = '首页',form = form,posts = posts,pagination = pagination)
 
 
 @main.route('/post/<int:id>',methods = ['GET','POST'])
@@ -283,5 +275,27 @@ def myfollow():
 	pagination = posts.paginate(page,per_page = current_app.config['WHY_POSTS_PER_PAGE'],error_out = False)
 	posts = pagination.items
 
-	return render_template('index.html',posts = posts,pagination = pagination)
+	return render_template('index.html',posts = posts,title = '我的关注',pagination = pagination)
+
+
+@main.route('/search',methods = ['GET','POST'])
+@login_required
+def search():
+	if not request.form['search']:
+		return redirect(url_for('main.index'))
+	return redirect(url_for('main.sh_results',keywords = request.form['search']))
+
+@main.route('/sh_results/<keywords>')
+@login_required
+def sh_results(keywords):
+
+	flask_whooshalchemyplus.index_one_model(Post)
+	results = Post.query.whoosh_search(keywords)
+
+	page = request.args.get('page',1,type = int)
+	pagination = results.paginate(page,per_page = current_app.config['WHY_POSTS_PER_PAGE'],error_out = False)
+	posts = pagination.items
+
+	return render_template('sh_results.html',keywords = keywords,posts = posts,pagination = pagination)
+
 
