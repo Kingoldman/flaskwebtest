@@ -87,7 +87,8 @@ def index():
 		db.session.add(post)
 		db.session.commit()
 		return redirect(url_for('main.index'))
-
+	#将每一次的提交加入索引,感觉搜索快一点
+	flask_whooshalchemyplus.index_one_model(Post)
 	page = request.args.get('page',1,type = int)
 	pagination = Post.query.order_by(Post.timestamp.desc()).paginate(page,per_page = current_app.config['WHY_POSTS_PER_PAGE'],error_out = False)
 	posts = pagination.items
@@ -289,7 +290,6 @@ def search():
 @login_required
 def sh_results(keywords):
 
-	flask_whooshalchemyplus.index_one_model(Post)
 	results = Post.query.whoosh_search(keywords)
 
 	page = request.args.get('page',1,type = int)
