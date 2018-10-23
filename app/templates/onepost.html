@@ -20,9 +20,3 @@
 {% endif %}
 
 {% endblock %}
-
-<!--markdown预览使用pagedown生成，flask_pagedown提供了一个模板宏-->
-{% block scripts %}
-{{ super() }}
-{{ pagedown.include_pagedown() }}
-{% endblock %}

@@ -2,18 +2,19 @@
 <style type="text/css">
     .col-xs-4{
         text-align: left;
-    font-weight: bold;
-    margin-right:140px;
-    margin-left:-30px;
+        font-weight: bold;
+        margin-right:0px;
+        margin-left:0px;
     }
-    .col-xs-5{
+    .col-xs-7{
         text-align: right; 
         margin-right:0px;
         margin-left:0px;
     }
     .row{
         margin-right: 0px;
-        margin-left: 0px;  
+        margin-left: 0px; 
+        text-align: right;
     }
 </style>
 
@@ -39,12 +40,12 @@
                     <div class="col-xs-4" >
                         {{ moment(post.timestamp).format('LLL') }}
                     </div>
-                    <div class = "col-xs-5">
+                    <div class = "col-xs-7">
                         {% if current_user.can() %}
                             <a href="{{ url_for('main.edit',id = post.id) }}"><span class="label label-warning">文章编辑[管理员]</span></a>
 
                         {% elif current_user == post.author %}
-                            <a href="{{ url_for('main.edit',id = post.id) }}"><span class="label label-primary">文章编辑</span></a>
+                            <a href="{{ url_for('main.edit',id = post.id) }}"><span class="label label-info">文章编辑</span></a>
                         {% endif %}
                             <!-- #comments后缀，找到<h4 id = "comments">评论</h4>,意思是评论提交后页面刷新停在h4那里-->
                         <a href="{{ url_for('main.allonepost',id = post.id) }}">

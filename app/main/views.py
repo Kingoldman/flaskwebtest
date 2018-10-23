@@ -3,18 +3,14 @@ from . import main
 from ..models import User,Post,Comment
 from flask_login import login_required,current_user
 from .forms import EditProfileForm,EditProfileAdminForm,PostForm,PostEditForm,CommentForm,DeleteCommentForm,DeletePostForm,PostEditForm
-from ..__init__ import db
+from ..__init__ import db,flask_whooshalchemyplus
 from ..decorators import admin_required
 import datetime
-
-
-
 
 
 @main.route('/about',methods = ['POST','GET'])
 def about():
 	return render_template('about.html')
-
 
 #资料页面路由
 @main.route('/user/<username>')
@@ -28,7 +24,6 @@ def user(username):
 	posts = pagination.items
 
 	return render_template('user.html',user = user,posts = posts,pagination = pagination)
-
 
 #用户级别编辑
 @main.route('/edit_profile',methods = ['POST','GET'])
@@ -92,15 +87,13 @@ def index():
 		db.session.add(post)
 		db.session.commit()
 		return redirect(url_for('main.index'))
-
+	#将每一次的提交加入索引,感觉搜索快一点
+	flask_whooshalchemyplus.index_one_model(Post)
 	page = request.args.get('page',1,type = int)
 	pagination = Post.query.order_by(Post.timestamp.desc()).paginate(page,per_page = current_app.config['WHY_POSTS_PER_PAGE'],error_out = False)
 	posts = pagination.items
 
-	return render_template('index.html',form = form,posts = posts,pagination = pagination)
-
-
-
+	return render_template('index.html',title = '首页',form = form,posts = posts,pagination = pagination)
 
 
 @main.route('/post/<int:id>',methods = ['GET','POST'])
@@ -212,3 +205,96 @@ def allonepost(id):
 	comments = pagination.items
 	#接收列表，为了_posts.html使用
 	return render_template('onepost.html',post = post,form = form,comments = comments,pagination = pagination)
+
+@main.route('/follow/<username>',methods = ['GET','POST'])
+@login_required
+def follow(username):
+	user = User.query.filter_by(username = username ).first()
+	if user is None:
+		flash("错误！")
+		return redirect(url_for('main.index'))
+	if current_user.is_following(user):
+		flash("你已经关注了%s"%username)
+		return redirect(url_for('main.user',username = username))
+	current_user.follow(user)
+	flash("你关注了%s"%username)
+	return redirect(url_for('main.user',username = username))
+
+
+@main.route('/unfollow/<username>',methods = ['GET','POST'])
+@login_required
+def unfollow(username):
+	user = User.query.filter_by(username = username ).first()
+	if user is None:
+		flash("错误！")
+		return redirect(url_for('main.index'))
+	if not current_user.is_following(user):
+		flash("你没有关注%s"%username)
+		return redirect(url_for('main.user',username = username))
+	current_user.unfollow(user)
+	flash("你取消了关注%s"%username)
+	return redirect(url_for('main.user',username = username))
+
+@main.route('/followers/<username>',methods = ['GET','POST'])
+@login_required
+def followers(username):
+	user = User.query.filter_by(username = username ).first()
+	if current_user != user and not current_user.can():
+		abort(403)
+	if user is None:
+		flash("错误！")
+		return redirect(url_for('main.index'))
+	page = request.args.get('page',1,type = int)
+	pagination = user.followers.paginate(page,per_page = current_app.config['WHY_FOLLOWERS_PER_PAGE'],error_out = False)
+	follows = [{'user':item.follower,'timestamp':item.timestamp} for item in pagination.items]
+	return render_template('followers.html',user = user,endpoint = 'main.followers',pagination = pagination,follows = follows)
+
+
+
+@main.route('/followed_by/<username>',methods = ['GET','POST'])
+@login_required
+def followed_by(username):
+	user = User.query.filter_by(username = username ).first()
+	if current_user != user and not current_user.can():
+		abort(403)
+	if user is None:
+		flash("错误！")
+		return redirect(url_for('main.index'))
+	page = request.args.get('page',1,type = int)
+	pagination = user.followed.paginate(page,per_page = current_app.config['WHY_FOLLOWERS_PER_PAGE'],error_out = False)
+	follows = [{'user':item.followed,'timestamp':item.timestamp} for item in pagination.items]
+	return render_template('followed_by.html',user = user,endpoint = 'main.followed_by',pagination = pagination,follows = follows)
+
+
+
+@main.route('/myfollow',methods = ['GET','POST'])
+@login_required
+def myfollow():
+	posts = current_user.followed_posts
+
+	page = request.args.get('page',1,type = int)
+	pagination = posts.paginate(page,per_page = current_app.config['WHY_POSTS_PER_PAGE'],error_out = False)
+	posts = pagination.items
+
+	return render_template('myfollow_posts.html',posts = posts,title = '我的关注',pagination = pagination)
+
+
+@main.route('/search',methods = ['GET','POST'])
+def search():
+	if not request.form['search']:
+		return redirect(url_for('main.index'))
+	return redirect(url_for('main.sh_results',keywords = request.form['search']))
+
+@main.route('/sh_results/<keywords>')
+@login_required
+def sh_results(keywords):
+
+	results = Post.query.whoosh_search(keywords)
+
+	page = request.args.get('page',1,type = int)
+	pagination = results.paginate(page,per_page = current_app.config['WHY_POSTS_PER_PAGE'],error_out = False)
+	posts = pagination.items
+
+	return render_template('sh_results.html',keywords = keywords,posts = posts,pagination = pagination)
+
+

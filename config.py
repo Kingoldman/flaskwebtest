@@ -11,6 +11,7 @@ class Config:
 	#每页显示文章数量
 	WHY_POSTS_PER_PAGE =  8
 	WHY_COMMENTS_PER_PAGE =  8
+	WHY_FOLLOWERS_PER_PAGE =  15
 
 	@staticmethod
 	def init_app(app):

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
+
+{% block title %}搜索结果{% endblock %}
+
+{% block page_content %}
+	<div class="page-header">
+		<h3>关键词："{{ keywords }}"</h3>
+	</div>
+
+	{% if posts %}
+	{% include '_posts.html' %}
+	{% else %}
+	没有搜索到结果。
+	{% endif %}
+
+	{% if pagination %}
+		<div class="pagination">
+		    {{ macros.pagination_widget(pagination,'main.sh_results',fragment = '',keywords = keywords ) }}
+		</div>
+	{% endif %}
+{% endblock %}

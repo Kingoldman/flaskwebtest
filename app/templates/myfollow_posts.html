@@ -1,0 +1,23 @@
+
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block page_content %}
+	
+	<div>
+		{% if posts %}
+			{% include '_posts.html' %}
+			{% if pagination %}
+			<div class="pagination">
+				{{ macros.pagination_widget(pagination,'main.myfollow') }}
+			</div>
+			{% endif %}
+		{% else %}
+			暂无文章。
+		{% endif %}
+    </div>
+
+{% endblock %}
