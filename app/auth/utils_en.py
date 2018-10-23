@@ -1,4 +1,4 @@
-#生成验证码
+#生成验证码方法,大概都是那个意思，直接copy了CSDN某篇博客
 # -*- coding: utf-8 -*-
 import random
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
