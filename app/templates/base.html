@@ -63,7 +63,6 @@
 </div>
 {% endblock %}
 
-
 {% block content %}
 	<div class="container">
 		{% for message in get_flashed_messages() %}
@@ -76,6 +75,7 @@
 		{% block page_content %}{% endblock %}
 	</div>
 {% endblock %}
+
 
 {% block scripts %}
 {{ super() }}

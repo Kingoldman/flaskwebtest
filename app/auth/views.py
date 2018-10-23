@@ -1,26 +1,60 @@
 
-from flask import render_template,url_for,redirect,flash,request
+from flask import render_template,url_for,redirect,flash,request,session,make_response
 from . import auth
 from .forms import LoginForm,RegistrationForm,ChangePasswordForm
 from app.models import User
 from flask_login import login_user,logout_user,login_required,current_user
 from .. import db
 from app.email import send_mail
+from . import utils_en,verifycode_generator
+
+
+
+#验证码
+@auth.route('/verifycode',methods = ['POST','GET'])
+def get_verify_code():
+	#把strs发给前端,或者在后台使用session保存
+    code_img, code_text = utils_en.generate_verification_code()
+    session['code_text'] = code_text
+    response = make_response(code_img)
+    response.headers['Content-Type'] = 'image/jpeg'
+    return response
+
+
+@auth.route('/register',methods = ['POST','GET'])
+def register():
+	form = RegistrationForm()
+	if form.validate_on_submit():
+		if 'code_text' in session and session['code_text'] != form.verification_code.data:
+			flash('验证码输入错误!')
+		else:
+			user = User(username = form.username.data,email = form.email.data,password = form.password.data)
+			db.session.add(user)
+			db.session.commit()
+			token = user.generate_confirmation_token()
+			send_mail(user.email,"激活账户",'auth/email/confirm',user = user,token = token)
+			flash("一封激活邮件已经发送到你的邮箱，请激活")
+			return redirect(url_for('auth.login'))
+	return render_template('auth/register.html',form = form)
 
 
 @auth.route('/login',methods = ['POST','GET'])
 def login():
 	form = LoginForm()
 	if form.validate_on_submit():
-		user = User.query.filter_by(email = form.email.data).first()
-		if user is not None and user.verify_password(form.password.data):
-			login_user(user,form.remember_me.data)
-			next = request.args.get('next')
-			if next is None or not next.startswith('/'):
-				next = url_for('main.index')
-			return redirect( next )
+		if 'code_text' in session and session['code_text'] != form.verification_code.data:
+			flash('验证码输入错误!')
 		else:
-			flash('账户名或密码错误')
+			user = User.query.filter_by(email = form.email.data).first()
+			if user is not None and user.verify_password(form.password.data):
+				login_user(user,form.remember_me.data)
+				flash("登陆成功")
+				next = request.args.get('next')
+				if next is None or not next.startswith('/'):
+					next = url_for('main.index')
+				return redirect( next )
+			else:
+				flash('账户名或密码错误')
 	return render_template('auth/login.html',form = form)
 
 
@@ -31,20 +65,6 @@ def logout():
 	flash("已经退出！")
 	return redirect(url_for('main.index'))
 
-
-
-@auth.route('/register',methods = ['POST','GET'])
-def register():
-	form = RegistrationForm()
-	if form.validate_on_submit():
-		user = User(username = form.username.data,email = form.email.data,password = form.password.data)
-		db.session.add(user)
-		db.session.commit()
-		token = user.generate_confirmation_token()
-		send_mail(user.email,"激活账户",'auth/email/confirm',user = user,token = token)
-		flash("一封激活邮件已经发送到你的邮箱，请激活")
-		return redirect(url_for('auth.login'))
-	return render_template('auth/register.html',form = form)
 
 
 @auth.route('/confirm/<token>')

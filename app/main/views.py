@@ -280,7 +280,6 @@ def myfollow():
 
 
 @main.route('/search',methods = ['GET','POST'])
-@login_required
 def search():
 	if not request.form['search']:
 		return redirect(url_for('main.index'))

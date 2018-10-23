@@ -9,6 +9,7 @@ from app.models import User
 class LoginForm(FlaskForm):
 	email = StringField('Email',validators = [DataRequired(),Email(message="邮箱格式错误")],render_kw={"placeholder": "yourname@example.com"})
 	password = PasswordField('密码',validators = [DataRequired(),Length(1,64)],render_kw={"placeholder": "请输入8-16位密码"})
+	verification_code =  StringField('验证码',validators = [DataRequired()],render_kw={"placeholder": "请输入验证码"})
 	remember_me = BooleanField('记住我')
 	submit = SubmitField('登陆')
 
@@ -17,6 +18,7 @@ class RegistrationForm(FlaskForm):
 	email = StringField('Email',validators = [DataRequired(),Email(message="邮箱格式错误"),Length(1,64)],render_kw={"placeholder": "yourname@example.com"})
 	password = PasswordField('密码',validators = [DataRequired(),EqualTo('password2',message = "密码不一致"),Length(1,64)],render_kw={"placeholder": "请输入8-16位密码"})
 	password2 = PasswordField('重复密码',validators = [DataRequired(),Length(1,64)],render_kw={"placeholder": "请再输入一遍密码"})
+	verification_code =  StringField('验证码',validators = [DataRequired()],render_kw={"placeholder": "请输入验证码"})
 	submit = SubmitField('注册')
 
 	def validate_username(self,username):
