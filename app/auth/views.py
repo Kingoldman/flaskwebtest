@@ -6,11 +6,7 @@ from app.models import User
 from flask_login import login_user,logout_user,login_required,current_user
 from .. import db
 from app.email import send_mail
-<<<<<<< HEAD
 from . import utils_en
-=======
-from . import utils_en,verifycode_generator
->>>>>>> origin/master
 
 
 
