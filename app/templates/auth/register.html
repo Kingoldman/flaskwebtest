@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% extends "base.html" %}
 {% import "bootstrap/wtf.html" as wtf %}
 
@@ -37,3 +38,44 @@
 		{{ wtf.quick_form(form) }}	
 	</div>	
 {% endblock %}
+=======
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block title %}注册{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    //修改提交按钮继承的类，按钮会变成蓝色
+    $("#submit").attr("class", "btn btn-success");
+    //修改提交按钮属性，上部外边界和宽度
+    $("#submit").css({
+        "width":"100%",
+        "margin-bottom":"10px"
+        });
+    //增加一个img元素在验证码标签内，因为这些标签是quick_form自动生成的，所以我们要采用动态添加的方式
+    function create_verify_code()
+    {
+        var img = $('<img id="verify_img" src="{{ url_for('auth.get_verify_code', _external=True) }}">');
+        $("#verification_code").before(img);
+    }
+    //开始创建验证码图片
+    create_verify_code();
+    $(document).ready(function(){
+        //点击验证码刷新，主要采取重设src属性，属性每次都要不一样，所以在网址后面增加参数
+        $("img").click(function(){
+            var img_url = "{{ url_for('auth.get_verify_code', _external=True) }}?d=" + Math.random();
+            $(this).attr("src", img_url);
+        });
+    });
+</script>
+{% endblock %}
+
+{% block page_content %}
+	<div class = "page-header"><h1>注册</h1></div>
+	<div class = 'col-md-4'>
+		{{ wtf.quick_form(form) }}	
+	</div>	
+{% endblock %}
+>>>>>>> origin/master
