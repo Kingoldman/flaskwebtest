@@ -3,6 +3,18 @@
 
 {% block title %}删除文章{% endblock %}
 
+{% block scripts %}
+{{ super() }}
+<script>
+    //修改提交按钮继承的类，按钮会变成蓝色
+    $("#submit").attr("class", "btn btn-danger");
+    //修改提交按钮属性，上部外边界和宽度
+    $("#submit").css({
+        "width":"100%",
+        "margin-bottom":"10px"
+        });
+</script>
+{% endblock %}
 
 {% block page_content %}
 	<div class = "page-header">
