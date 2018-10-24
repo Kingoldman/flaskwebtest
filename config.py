@@ -20,7 +20,7 @@ class Config:
 	
 	MAIL_USE_TLS = False
 	MAIL_USE_SSL = True
-	SSL_REDIRECT = False
+	SSL_DISABLE = True
 
 	#每页显示数量
 	WHY_POSTS_PER_PAGE =  8
@@ -40,11 +40,27 @@ class DevelopmentConfig(Config):
 
 	
 class ProductionConfig(Config):
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///' + os.path.join(basedir, 'data.sqlite')
-
+	SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or 'sqlite:///'+os.path.join(basedir,'data.sqlite')
+	@classmethod
+	def init_app(cls,app):
+		Config.init_app(app)
 
 class HerokuConfig(ProductionConfig):
-	pass
+	SSL_DISABLE = bool( os.environ.get('SSL_DISABLE'))
+	@classmethod
+	def init_app(cls, app):
+		ProductionConfig.init_app(app)
+
+		#处理代理服务器首部
+		from werkzeug.contrib.fixers import ProxyFix
+		app.wsgi_app = ProxyFix(app.wsgi_app)
+
+		#错误日志
+		import logging
+		from logging import StreamHandler
+		file_handler = StreamHandler()
+		file_handler.setLevel(logging.INFO)
+		app.logger.addHandler(file_handler)
 
 
 config = {

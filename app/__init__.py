@@ -33,6 +33,11 @@ def create_app(config_name):
 	pagedown.init_app(app)
 	flask_whooshalchemyplus.init_app(app)
 
+	#把所有请求重定向到安全http
+	if not app.config['SSL_DISABLE']:
+		from flask_sslify import SSLify
+		sslify = SSLify(app)
+
 	from .main import main
 	app.register_blueprint(main)
 	from .auth import auth
