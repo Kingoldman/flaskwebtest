@@ -7,12 +7,11 @@ class Config:
 	SECRET_KEY = os.environ.get('SECRET_KEY') or 'GSDG%67&*&)+()&&vbb*&'
 	MAIL_SERVER = os.environ.get('MAIL_SERVER', 'smtp.qq.com')
 	MAIL_PORT = int(os.environ.get('MAIL_PORT', ' 465'))
-	MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', 'true').lower() in \
-        ['true', 'on', '1']
+	MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS', 'true').lower() in ['true', 'on', '1']
 	MAIL_USE_SSL = True
 	SSL_REDIRECT = False
 	MAIL_USERNAME = os.environ.get('MAIL_USERNAME') or '479260115@qq.com'
-    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD') or 'dtqoehgzpkuibgcg'
+	MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD') or 'dtqoehgzpkuibgcg'
 	
 	MAIL_DEFAULT_SENDER = '479260115@qq.com'
 
