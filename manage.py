@@ -1,4 +1,4 @@
-from flask_migrate import Migrate,MigrateCommand,upgrade
+from flask_migrate import Migrate,MigrateCommand
 from flask_script import Manager,Shell
 from app import create_app,db
 from app.models import *
@@ -20,6 +20,7 @@ manager.add_command('db',MigrateCommand)
 
 @manager.command
 def deploy():
+	from flask_migrate import upgrade
 	upgrade()
 
 
