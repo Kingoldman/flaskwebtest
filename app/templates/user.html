@@ -50,7 +50,7 @@
 	<p>
 		{% if user != current_user %}
 			{% if not current_user.is_following(user) %}
-				<a class = "btn btn-primary" href = "{{ url_for('main.follow',username = user.username ) }}">
+				<a class = "btn btn-info" href = "{{ url_for('main.follow',username = user.username ) }}">
 					关注
 				</a>
 			{% else %}
