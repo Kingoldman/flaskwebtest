@@ -27,6 +27,7 @@ class Config:
 	WHY_COMMENTS_PER_PAGE =  8
 	WHY_FOLLOWERS_PER_PAGE =  15
 
+
 	@staticmethod
 	def init_app(app):
 		pass
@@ -40,7 +41,7 @@ class DevelopmentConfig(Config):
 
 	
 class ProductionConfig(Config):
-	SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///'+os.path.join(basedir,'data.sqlite')
+	SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///'+ os.path.join(basedir,'data.sqlite')
 	@classmethod
 	def init_app(cls,app):
 		Config.init_app(app)

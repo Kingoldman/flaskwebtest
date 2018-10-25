@@ -1,15 +1,18 @@
 #生成验证码方法,大概都是那个意思，直接copy了CSDN某篇博客
 # -*- coding: utf-8 -*-
+import os
 import random
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
 from io import BytesIO
+
+font_basedir = os.path.abspath(os.path.dirname(__file__))
 
 _letter_cases = "abcdefghjkmnpqrstuvwxy"  # 小写字母，去除可能干扰的i，l，o，z
 _upper_cases = _letter_cases.upper()  # 大写字母
 _numbers = ''.join(map(str, range(3, 10)))  # 数字
 init_chars = ''.join(( _upper_cases, _numbers))
-fontType = 'C:\Windows\Fonts\Arial.ttf'
-
+#fontType = 'C:\Windows\Fonts\Arial.ttf'
+fontType = os.path.join(font_basedir,'arial.ttf')
 
 def create_validate_code(size=(120, 30),
                          chars=init_chars,

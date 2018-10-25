@@ -8,6 +8,7 @@ from flask_moment import Moment
 from flask_pagedown import PageDown
 import flask_whooshalchemyplus
 
+
 moment = Moment()
 db = SQLAlchemy()
 bootstrap = Bootstrap()

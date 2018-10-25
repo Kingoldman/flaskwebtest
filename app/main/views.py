@@ -86,9 +86,10 @@ def index():
 		post = Post( body = form.body.data,author = current_user._get_current_object())
 		db.session.add(post)
 		db.session.commit()
+		#将每一次的提交加入索引
+		flask_whooshalchemyplus.index_one_model(Post)
 		return redirect(url_for('main.index'))
-	#将每一次的提交加入索引,感觉搜索快一点
-	flask_whooshalchemyplus.index_one_model(Post)
+
 	page = request.args.get('page',1,type = int)
 	pagination = Post.query.order_by(Post.timestamp.desc()).paginate(page,per_page = current_app.config['WHY_POSTS_PER_PAGE'],error_out = False)
 	posts = pagination.items
@@ -282,6 +283,7 @@ def myfollow():
 @main.route('/search',methods = ['GET','POST'])
 def search():
 	if not request.form['search']:
+		flash("请输入搜索内容")
 		return redirect(url_for('main.index'))
 	return redirect(url_for('main.sh_results',keywords = request.form['search']))
 
@@ -295,6 +297,7 @@ def sh_results(keywords):
 	pagination = results.paginate(page,per_page = current_app.config['WHY_POSTS_PER_PAGE'],error_out = False)
 	posts = pagination.items
 
-	return render_template('sh_results.html',keywords = keywords,posts = posts,pagination = pagination)
+
+	return render_template('sh_results.html',keywords = keywords,posts = posts,pagination = pagination,count = len(posts))
 
 

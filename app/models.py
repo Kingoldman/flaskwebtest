@@ -1,5 +1,5 @@
 
-from .__init__ import db
+from .__init__ import db,flask_whooshalchemyplus
 from werkzeug.security import generate_password_hash,check_password_hash
 from flask_login import UserMixin,AnonymousUserMixin
 from app import loginmanager
@@ -7,8 +7,8 @@ from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import current_app,request
 from datetime import datetime
 import hashlib
-import bleach
-from markdown import markdown
+#import bleach
+#from markdown import markdown
 
 #结巴分词搜索用中文搜索
 from jieba.analyse.analyzer import ChineseAnalyzer
