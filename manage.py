@@ -25,3 +25,7 @@ flask_whooshalchemyplus.whoosh_index(app,Post)
 def deploy():
 	from flask_migrate import upgrade
 	upgrade()
+
+
+if __name__ == "__main__":
+	manager.run()

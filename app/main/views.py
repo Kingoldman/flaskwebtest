@@ -277,7 +277,7 @@ def myfollow():
 	pagination = posts.paginate(page,per_page = current_app.config['WHY_POSTS_PER_PAGE'],error_out = False)
 	posts = pagination.items
 
-	return render_template('myfollow_posts.html',posts = posts,title = '我的关注',pagination = pagination)
+	return render_template('myfollow_posts.html',posts = posts,title = '我的关注',pagination = pagination,user = current_user)
 
 
 @main.route('/search',methods = ['GET','POST'])
